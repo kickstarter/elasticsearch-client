@@ -4,19 +4,21 @@ module ElasticSearch
   class Client
     include ElasticSearch::API
 
-    attr_accessor :current_server, :fetch_servers, :seed_servers, :servers, :refreshed_at, :refresh_period
+    attr_accessor :current_server, :fetch_servers, :seed_servers, :servers, :refreshed_at, :refresh_period, :timeout
 
     def initialize(args = {})
       args = defaults.merge(args)
       @fetch_servers = args[:fetch_servers] # Proc returning array of server strings
       @refresh_period = args[:refresh_period] # Seconds before refreshing list of servers
       @seed_servers = Array(args[:servers])
+      @timeout = args[:timeout]
     end
 
     def defaults
       {
         refresh_period: 60,
-        servers: ['http://127.0.0.1:9200']
+        servers: ['http://127.0.0.1:9200'],
+        timeout: 2
       }
     end
 
@@ -64,7 +66,7 @@ module ElasticSearch
     end
 
     def connection
-      @connection ||= Faraday.new(:url => current_server) do |builder|
+      @connection ||= Faraday.new(url: current_server, request: {timeout: @timeout}) do |builder|
         builder.request  :json
         builder.response :json, :content_type => /\bjson$/
         builder.adapter :excon

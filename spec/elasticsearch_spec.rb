@@ -4,7 +4,7 @@ describe 'elasticsearch client' do
   let(:servers) { ['http://127.0.0.1:9200'] }
 
   subject do
-    ElasticSearch::Client.new(:servers => servers)
+    ElasticSearch::Client.new(servers: servers)
   end
 
   it 'is available' do
@@ -25,5 +25,12 @@ describe 'elasticsearch client' do
 
     subject.refresh_servers
     subject.servers.must_equal custom_servers
+  end
+
+  describe 'with a short timeout' do
+    subject { ElasticSearch::Client.new(servers: servers, timeout: 0.000001) }
+    it 'should raise a timeout error' do
+      -> { subject.get("/") }.must_raise ElasticSearch::ConnectionFailed
+    end
   end
 end
