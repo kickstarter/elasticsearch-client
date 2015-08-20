@@ -15,6 +15,18 @@ describe 'elasticsearch client' do
     subject.should_refresh?.must_equal true
   end
 
+  it 'should return a version' do
+    subject.version.must_be_instance_of Gem::Version
+  end
+
+  it 'should be able to detect lower versions' do
+    subject.version_is_at_least('0.0.0').must_equal true
+  end
+
+  it 'should be able to detect higher versions' do
+    subject.version_is_at_least('999.0.0').must_equal false
+  end
+
   it 'defaults to seed servers when fetching' do
     subject.fetch_servers.must_equal servers
   end
