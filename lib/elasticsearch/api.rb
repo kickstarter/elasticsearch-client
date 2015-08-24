@@ -204,8 +204,14 @@ module ElasticSearch
     #
     # Returns a hash, the parsed response body from elasticsearch
     def get_mapping(index, types)
+      path = if version_is_at_least("1.0")
+        "#{index}/_mapping/#{types}"
+      else
+        "#{index}/#{types}/_mapping"
+      end
+
       resp = get do |req|
-        req.url "#{index}/#{types}/_mapping"
+        req.url path
       end
       resp.body
     end
@@ -218,8 +224,14 @@ module ElasticSearch
     #
     # Returns a hash, the parsed response body from elasticsearch
     def put_mapping(index, type, mapping)
+      path = if version_is_at_least("1.0")
+        "#{index}/_mapping/#{type}"
+      else
+        "#{index}/#{type}/_mapping"
+      end
+
       resp = put do |req|
-        req.url "#{index}/#{type}/_mapping"
+        req.url path
         req.body = mapping
       end
       resp.body
@@ -292,6 +304,29 @@ module ElasticSearch
       resp.status == 200
     end
 
+    # Info about this ES cluster
+    #
+    # Returns a hash, for example:
+    # {
+    #   "status" : 200,
+    #   "name" : "my_node_name",
+    #   "cluster_name" : "my_elasticsearch_cluster",
+    #   "version" : {
+    #     "number" : "1.7.1",
+    #     "build_hash" : "abc123",
+    #     "build_timestamp" : "2015-01-01T00:00:00Z",
+    #     "build_snapshot" : false,
+    #     "lucene_version" : "4.10.4"
+    #   },
+    #   "tagline" : "You Know, for Search"
+    # }
+    def meta
+      resp = get do |req|
+        req.url '/'
+      end
+      resp.body
+    end
+
     # Initiates or continues a scrolling scan of the index.
     #
     # On the initial call a cursor (`_scroll_id`) is acquired, along with the first page of
@@ -324,5 +359,6 @@ module ElasticSearch
       end
       resp.body
     end
+
   end
 end

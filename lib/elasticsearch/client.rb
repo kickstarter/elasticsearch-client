@@ -44,7 +44,17 @@ module ElasticSearch
       @servers = @seed_servers.clone
       @current_server = @servers.first
       @refreshed_at = Time.now
+      @version = nil
       @connection = nil
+    end
+
+    # Returns the major/minor version
+    def version
+      @version ||= Gem::Version.new(meta['version']['number'])
+    end
+
+    def version_is_at_least(other_version)
+      version >= Gem::Version.new(other_version)
     end
 
     def fetch_servers
