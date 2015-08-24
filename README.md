@@ -1,6 +1,6 @@
-# ElasticSearch ruby client
+# ElasticSearch Ruby Client
 
-ElasticSearch ruby client. Credit goes to my coworkers at GitHub, I just turned it into a gem.
+Ruby client for ElasticSearch. Credit goes to my coworkers at GitHub; I just turned it into a gem.
 
 ## Usage
 
